@@ -18,6 +18,14 @@ DFA_read_character(DFA *dfa, char character)
   dfa->current_state = DFARulebook_next_state(dfa->rulebook, dfa->current_state, character);
 }
 
+void
+DFA_read_string(DFA *dfa, char *string)
+{
+  char ch;
+  char *ptr = string;
+  while((ch = *ptr++)) DFA_read_character(dfa, ch);
+}
+
 DFA*
 DFA_create(unsigned int current_state, unsigned int accept_states[], DFARulebook *rulebook)
 {

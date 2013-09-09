@@ -11,6 +11,12 @@ char *test_accepting() {
   mu_assert(!DFA_accepting(dfa), "DFA accepting at state 2.");
   DFA_read_character(dfa, 'b');
   mu_assert(DFA_accepting(dfa), "DFA not accepting at state 3.");
+
+  dfa->current_state = 1; // reset
+
+  DFA_read_string(dfa, "ab");
+  mu_assert(DFA_accepting(dfa), "DFA not accepting at state 3.");
+
   return NULL;
 }
 

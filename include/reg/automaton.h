@@ -12,6 +12,7 @@ typedef struct DFA_s {
 DFA* DFA_create(unsigned int current_state, unsigned int accept_states[], DFARulebook *rulebook);
 unsigned int DFA_accepting(DFA *dfa);
 void DFA_read_character(DFA *dfa, char character);
+void DFA_read_string(DFA *dfa, char *string);
 #define DFA_destroy(A) (free(A))
 
 #endif
