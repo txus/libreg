@@ -3,6 +3,8 @@
 Regular expressions library implemented as non-deterministic finite-state
 automata.
 
+Design inspired by "Understanding Computation", an amazing book by Tom Stuart.
+
 ## Using
 
 ### Installing it as a submodule
