@@ -6,10 +6,10 @@
 typedef struct DFA_s {
   unsigned int current_state;
   unsigned int accept_states[100];
-  DFARulebook *rulebook;
+  Rulebook *rulebook;
 } DFA;
 
-DFA* DFA_create(unsigned int current_state, unsigned int accept_states[], DFARulebook *rulebook);
+DFA* DFA_create(unsigned int current_state, unsigned int accept_states[], Rulebook *rulebook);
 unsigned int DFA_accepting(DFA *dfa);
 void DFA_read_character(DFA *dfa, char character);
 void DFA_read_string(DFA *dfa, char *string);

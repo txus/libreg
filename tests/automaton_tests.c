@@ -2,7 +2,7 @@
 #include "rulebook_util.h"
 #include <reg/automaton.h>
 
-static DFARulebook *rulebook = NULL;
+static Rulebook *rulebook = NULL;
 static DFA *dfa = NULL;
 
 char *test_accepting() {
@@ -23,7 +23,7 @@ char *test_accepting() {
 char *all_tests() {
   mu_suite_start();
 
-  DFARulebook_build(
+  Rulebook_build(
     { .state = 1, .character = 'a', .next_state = 2 },
     { .state = 2, .character = 'b', .next_state = 3 }
   );
@@ -32,7 +32,7 @@ char *all_tests() {
 
   mu_run_test(test_accepting);
 
-  DFARulebook_destroy(rulebook);
+  Rulebook_destroy(rulebook);
   DFA_destroy(dfa);
 
   return NULL;

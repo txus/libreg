@@ -15,7 +15,7 @@ DFA_accepting(DFA *dfa)
 void
 DFA_read_character(DFA *dfa, char character)
 {
-  dfa->current_state = DFARulebook_next_state(dfa->rulebook, dfa->current_state, character);
+  dfa->current_state = Rulebook_next_state(dfa->rulebook, dfa->current_state, character);
 }
 
 void
@@ -27,7 +27,7 @@ DFA_read_string(DFA *dfa, char *string)
 }
 
 DFA*
-DFA_create(unsigned int current_state, unsigned int accept_states[], DFARulebook *rulebook)
+DFA_create(unsigned int current_state, unsigned int accept_states[], Rulebook *rulebook)
 {
   DFA *automaton           = calloc(1, sizeof(DFA));
   automaton->current_state = current_state;

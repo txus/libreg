@@ -1,21 +1,21 @@
 #include <stdlib.h>
 #include <reg/rulebook.h>
 
-DFARulebook*
-DFARulebook_create()
+Rulebook*
+Rulebook_create()
 {
-  DFARulebook *rulebook = calloc(1, sizeof(DFARulebook));
+  Rulebook *rulebook = calloc(1, sizeof(Rulebook));
   return rulebook;
 }
 
 void
-DFARulebook_add_rule(DFARulebook *rulebook, FARule *rule) {
+Rulebook_add_rule(Rulebook *rulebook, FARule *rule) {
   rulebook->rules[rulebook->count] = rule;
   rulebook->count++;
 }
 
 static inline FARule*
-DFARulebook_rule_for(DFARulebook *rulebook, unsigned int state, char character)
+Rulebook_rule_for(Rulebook *rulebook, unsigned int state, char character)
 {
   for(int i=0; i < rulebook->count; i++) {
     FARule *rule = rulebook->rules[i];
@@ -27,12 +27,13 @@ DFARulebook_rule_for(DFARulebook *rulebook, unsigned int state, char character)
 }
 
 unsigned int 
-DFARulebook_next_state(DFARulebook *rulebook, unsigned int state, char character)
+Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character)
 {
   unsigned int next_state = UNDEFINED;
-  FARule *rule = DFARulebook_rule_for(rulebook, state, character);
+  FARule *rule = Rulebook_rule_for(rulebook, state, character);
 
   if(rule) next_state = FARule_follow(rule);
 
   return next_state;
 }
+

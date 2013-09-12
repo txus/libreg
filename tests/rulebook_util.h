@@ -1,9 +1,9 @@
-#define DFARulebook_build(...) {                       \
+#define Rulebook_build(...) {                       \
   FARule rules[] = (FARule[]) {__VA_ARGS__};           \
   unsigned short count = sizeof(rules)/sizeof(FARule); \
-  rulebook = DFARulebook_create();                     \
+  rulebook = Rulebook_create();                     \
   for(int i=0; i < count; i++) {                       \
-    DFARulebook_add_rule(rulebook, &rules[i]);         \
+    Rulebook_add_rule(rulebook, &rules[i]);         \
   }                                                    \
 }
 

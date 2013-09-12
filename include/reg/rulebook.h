@@ -3,14 +3,14 @@
 
 #include <reg/rule.h>
 
-typedef struct DFARulebook_s {
+typedef struct Rulebook_s {
   FARule *rules[100];
   unsigned int count;
-} DFARulebook;
+} Rulebook;
 
-DFARulebook* DFARulebook_create();
-void DFARulebook_add_rule(DFARulebook *rulebook, FARule *rule);
-unsigned int DFARulebook_next_state(DFARulebook *rulebook, unsigned int state, char character);
-#define DFARulebook_destroy(R) (free(R))
+Rulebook* Rulebook_create();
+void Rulebook_add_rule(Rulebook *rulebook, FARule *rule);
+unsigned int Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character);
+#define Rulebook_destroy(R) (free(R))
 
 #endif
