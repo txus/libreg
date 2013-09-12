@@ -12,5 +12,6 @@ Rulebook* Rulebook_create();
 void Rulebook_add_rule(Rulebook *rulebook, FARule *rule);
 unsigned int Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character);
 #define Rulebook_destroy(R) (free(R))
+unsigned int* Rulebook_next_states(Rulebook *rulebook, unsigned int states[], char character);
 
 #endif
