@@ -2,4 +2,3 @@ language: c
 script: sudo apt-get install valgrind; make valgrind
 compiler:
   - clang
-  - gcc
