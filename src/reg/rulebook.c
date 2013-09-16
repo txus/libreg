@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <reg/rulebook.h>
 #include <reg/automaton.h>
 
