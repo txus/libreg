@@ -2,9 +2,10 @@
 #define _LIBREG_RULEBOOK_H_
 
 #include <reg/rule.h>
+#define MAX_RULES 100
 
 typedef struct Rulebook_s {
-  FARule *rules[100];
+  FARule *rules[MAX_RULES];
   unsigned int count;
 } Rulebook;
 

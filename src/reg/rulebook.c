@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <reg/rulebook.h>
+#include <reg/automaton.h>
 
 Rulebook*
 Rulebook_create()
@@ -40,14 +42,13 @@ Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character)
 unsigned int*
 Rulebook_next_states(Rulebook *rulebook, unsigned int states[], char character)
 {
-  unsigned long len = sizeof(&states) / sizeof(states[0]);
-  unsigned int *next_states = calloc(100, sizeof(unsigned int));
-  unsigned int state = 0;
+  unsigned int *next_states = calloc(MAX_STATES, sizeof(unsigned int));
+  unsigned int state = UNDEFINED;
 
-  for(int i=0; i < len; i++) {
+  NFA_states_foreach(states, i, {
     state = Rulebook_next_state(rulebook, states[i], character);
     next_states[state] = state;
-  }
+  })
 
   return next_states;
 }
