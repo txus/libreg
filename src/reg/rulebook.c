@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <reg/rulebook.h>
 #include <reg/automaton.h>
 
@@ -51,3 +52,16 @@ Rulebook_next_states(Rulebook *rulebook, unsigned int states[], char character)
 
   return next_states;
 }
+
+unsigned int*
+Rulebook_follow_free_moves(Rulebook *rulebook, unsigned int states[])
+{
+  unsigned int *more_states = Rulebook_next_states(rulebook, states, FREE_MOVE);
+
+  NFA_states_foreach(states, i, {
+    more_states[i] = states[i];
+  })
+
+  return more_states;
+}
+

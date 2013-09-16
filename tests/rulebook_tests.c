@@ -41,11 +41,33 @@ char *test_next_states() {
   return NULL;
 }
 
+char *test_follow_free_moves() {
+  Rulebook_build(
+    { .state = 1, .character = '\0', .next_state = 2 },
+    { .state = 2, .character = '\0', .next_state = 3 }
+  );
+
+  unsigned int *next_states = Rulebook_follow_free_moves(
+    rulebook,
+    (unsigned int[MAX_STATES]){0,1,2,0}
+  );
+
+  mu_assert(
+    (next_states[1] == 1 && next_states[2] == 2 && next_states[3] == 3),
+    "Didn't follow free moves from states 1 and 2 to states 2 and 3"
+  );
+
+  free(next_states);
+  Rulebook_destroy(rulebook);
+  return NULL;
+}
+
 char *all_tests() {
   mu_suite_start();
 
   mu_run_test(test_next_state);
   mu_run_test(test_next_states);
+  mu_run_test(test_follow_free_moves);
 
   return NULL;
 }

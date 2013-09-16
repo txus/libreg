@@ -55,9 +55,14 @@ NFA_create(unsigned int current_states[], unsigned int accept_states[], Rulebook
 unsigned int
 NFA_accepting(NFA *nfa)
 {
-  NFA_states_foreach(nfa->current_states, i, {
+  unsigned int *current_states = Rulebook_follow_free_moves(
+    nfa->rulebook,
+    nfa->current_states
+    );
+
+  NFA_states_foreach(current_states, i, {
     NFA_states_foreach(nfa->accept_states, j, {
-      if(nfa->current_states[i] == nfa->accept_states[j]) return 1;
+      if(current_states[i] == nfa->accept_states[j]) return 1;
     })
   })
 

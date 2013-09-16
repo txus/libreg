@@ -2,6 +2,7 @@
 #define _LIBREG_RULE_H_
 
 #define UNDEFINED 0
+#define FREE_MOVE '\0'
 #define MAX_STATES 100
 
 typedef struct FARule_s {
