@@ -3,7 +3,7 @@
 Regular expressions library implemented as non-deterministic finite-state
 automata.
 
-Design inspired by "Understanding Computation", an amazing book by Tom Stuart.
+Design inspired by [Understanding Computation][book], an amazing book by Tom Stuart.
 
 ## Warning: NOT USABLE YET! Work in progress!
 
@@ -71,3 +71,4 @@ me!).
 5. Create new Pull Request
 
 [twitter]: https://twitter.com/txustice
+[book]: http://computationbook.com/
