@@ -5,6 +5,8 @@ automata.
 
 Design inspired by "Understanding Computation", an amazing book by Tom Stuart.
 
+## Warning: NOT USABLE YET! Work in progress!
+
 ## Using
 
 ### Installing it as a submodule
