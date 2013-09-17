@@ -4,11 +4,9 @@
 unsigned int
 DFA_accepting(DFA *dfa)
 {
-  for(int i=0; i < sizeof(&(dfa->accept_states)) / sizeof(unsigned int); i++) {
-    if(dfa->accept_states[i] == dfa->current_state) {
-      return 1;
-    }
-  }
+  Set_foreach(dfa->accept_states, state, {
+    if(state == dfa->current_state) return 1;
+  })
   return 0;
 }
 
@@ -27,60 +25,69 @@ DFA_read_string(DFA *dfa, char *string)
 }
 
 DFA*
-DFA_create(unsigned int current_state, unsigned int accept_states[], Rulebook *rulebook)
+DFA_create(unsigned int current_state, Set *accept_states, Rulebook *rulebook)
 {
   DFA *automaton           = calloc(1, sizeof(DFA));
   automaton->current_state = current_state;
-  for(int i=0; i < (sizeof(&accept_states) / sizeof(unsigned int)); i++) {
-    automaton->accept_states[i] = accept_states[i];
-  }
+  automaton->accept_states = accept_states;
   automaton->rulebook      = rulebook;
   return automaton;
 }
 
+void
+DFA_destroy(DFA *dfa)
+{
+  Set_destroy(dfa->accept_states);
+  free(dfa);
+}
+
 NFA*
-NFA_create(unsigned int current_states[], unsigned int accept_states[], Rulebook *rulebook)
+NFA_create(Set *current_states, Set *accept_states, Rulebook *rulebook)
 {
   NFA *automaton = calloc(1, sizeof(NFA));
-
-  for(int i=0; i < MAX_STATES; i++) {
-    automaton->current_states[current_states[i]] = current_states[i];
-    automaton->accept_states[accept_states[i]] = accept_states[i];
-  }
-
+  automaton->current_states = current_states;
+  automaton->accept_states = accept_states;
   automaton->rulebook = rulebook;
   return automaton;
+}
+
+void
+NFA_destroy(NFA *nfa)
+{
+  Set_destroy(nfa->current_states);
+  Set_destroy(nfa->accept_states);
+  free(nfa);
 }
 
 unsigned int
 NFA_accepting(NFA *nfa)
 {
-  unsigned int *current_states = Rulebook_follow_free_moves(
+  Set *current_states = Rulebook_follow_free_moves(
     nfa->rulebook,
     nfa->current_states
     );
 
-  NFA_states_foreach(current_states, i, {
-    NFA_states_foreach(nfa->accept_states, j, {
-      if(current_states[i] == nfa->accept_states[j]) return 1;
+  Set_foreach(current_states, cur, {
+    Set_foreach(nfa->accept_states, acc, {
+      if(cur == acc)  {
+        Set_destroy(current_states);
+        return 1;
+      }
     })
   })
 
+  Set_destroy(current_states);
   return 0;
 }
 
 void
 NFA_read_character(NFA *nfa, char character)
 {
-  unsigned int *old_states = nfa->current_states;
-  unsigned int *new_states = Rulebook_next_states(nfa->rulebook, nfa->current_states, character);
+  Set *old_states = nfa->current_states;
+  Set *new_states = Rulebook_next_states(nfa->rulebook, nfa->current_states, character);
 
-  NFA_states_foreach(new_states, i, {
-    old_states[i] = UNDEFINED;
-    old_states[new_states[i]] = new_states[i];
-  })
-
-  free(new_states);
+  nfa->current_states = new_states;
+  Set_destroy(old_states);
 }
 
 void

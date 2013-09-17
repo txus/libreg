@@ -8,11 +8,14 @@ static NFA *nfa = NULL;
 
 char *test_dfa_accepting() {
   Rulebook_build(
-    { .state = 1, .character = 'a', .next_state = 2 },
-    { .state = 2, .character = 'b', .next_state = 3 }
+    { .state = STATE(rulebook, 1), .character = 'a', .next_state = STATE(rulebook, 2) },
+    { .state = STATE(rulebook, 2), .character = 'b', .next_state = STATE(rulebook, 3) }
   );
 
-  dfa = DFA_create(1, (unsigned int[]){3, 0}, rulebook);
+  Set *accept_states = Set_create();
+  Set_push(accept_states, STATE(rulebook, 3));
+
+  dfa = DFA_create(STATE(rulebook, 1), accept_states, rulebook);
 
   mu_assert(!DFA_accepting(dfa), "DFA accepting at state 1.");
   DFA_read_character(dfa, 'a');
@@ -20,7 +23,7 @@ char *test_dfa_accepting() {
   DFA_read_character(dfa, 'b');
   mu_assert(DFA_accepting(dfa), "DFA not accepting at state 3.");
 
-  dfa->current_state = 1; // reset
+  dfa->current_state = STATE(rulebook, 1); // reset
 
   DFA_read_string(dfa, "ab");
   mu_assert(DFA_accepting(dfa), "DFA not accepting at state 3.");
@@ -32,14 +35,20 @@ char *test_dfa_accepting() {
 
 char *test_nfa_accepting() {
   Rulebook_build(
-    { .state = 1, .character = 'a', .next_state = 2 },
-    { .state = 2, .character = 'a', .next_state = 3 }
+    { .state = STATE(rulebook, 1), .character = 'a', .next_state = STATE(rulebook, 2) },
+    { .state = STATE(rulebook, 2), .character = 'a', .next_state = STATE(rulebook, 3) }
   );
 
-  nfa = NFA_create(
-    (unsigned int[MAX_STATES]){1,2,0},
-    (unsigned int[MAX_STATES]){3,4,0},
-    rulebook);
+  Set *initial_states = Set_create();
+  Set *accept_states = Set_create();
+
+  Set_push(initial_states, STATE(rulebook, 1));
+  Set_push(initial_states, STATE(rulebook, 2));
+
+  Set_push(accept_states, STATE(rulebook, 3));
+  Set_push(accept_states, STATE(rulebook, 4));
+
+  nfa = NFA_create(initial_states, accept_states, rulebook);
 
   mu_assert(!NFA_accepting(nfa), "NFA accepting at states 1 and 2.");
 
@@ -48,22 +57,27 @@ char *test_nfa_accepting() {
   mu_assert(NFA_accepting(nfa), "NFA not accepting at state 3.");
 
   Rulebook_destroy(rulebook);
+  NFA_destroy(nfa);
   return NULL;
 }
 
 char *test_nfa_accepting_with_free_moves() {
   Rulebook_build(
-    { .state = 1, .character = '\0', .next_state = 2 }
+    { .state = STATE(rulebook, 1), .character = '\0', .next_state = STATE(rulebook, 2) }
   );
 
-  nfa = NFA_create(
-    (unsigned int[MAX_STATES]){1,0},
-    (unsigned int[MAX_STATES]){2,0},
-    rulebook);
+  Set *initial_states = Set_create();
+  Set_push(initial_states, STATE(rulebook, 1));
+
+  Set *accept_states = Set_create();
+  Set_push(accept_states, STATE(rulebook, 2));
+
+  nfa = NFA_create(initial_states, accept_states, rulebook);
 
   mu_assert(NFA_accepting(nfa), "NFA not accepting at freely achieved state 4.");
 
   Rulebook_destroy(rulebook);
+  NFA_destroy(nfa);
   return NULL;
 }
 

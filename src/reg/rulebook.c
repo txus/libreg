@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 #include <reg/rulebook.h>
 #include <reg/automaton.h>
 
@@ -39,27 +39,27 @@ Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character)
   return next_state;
 }
 
-unsigned int*
-Rulebook_next_states(Rulebook *rulebook, unsigned int states[], char character)
+Set*
+Rulebook_next_states(Rulebook *rulebook, Set *states, char character)
 {
-  unsigned int *next_states = calloc(MAX_STATES, sizeof(unsigned int));
+  Set *next_states = Set_create();
   unsigned int state = UNDEFINED;
 
-  NFA_states_foreach(states, i, {
-    state = Rulebook_next_state(rulebook, states[i], character);
-    next_states[state] = state;
+  Set_foreach(states, st, {
+    state = Rulebook_next_state(rulebook, st, character);
+    Set_push(next_states, state);
   })
 
   return next_states;
 }
 
-unsigned int*
-Rulebook_follow_free_moves(Rulebook *rulebook, unsigned int states[])
+Set*
+Rulebook_follow_free_moves(Rulebook *rulebook, Set *states)
 {
-  unsigned int *more_states = Rulebook_next_states(rulebook, states, FREE_MOVE);
+  Set *more_states = Rulebook_next_states(rulebook, states, FREE_MOVE);
 
-  NFA_states_foreach(states, i, {
-    more_states[i] = states[i];
+  Set_foreach(states, st, {
+    Set_push(more_states, st);
   })
 
   return more_states;
