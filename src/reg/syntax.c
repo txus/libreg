@@ -54,7 +54,17 @@ ASTRepeat_create(ASTNode *pattern)
 }
 
 NFA*
-ASTEmpty_to_nfa(ASTEmpty *empty)
+ASTNode_to_nfa(ASTNode *node)
+{
+  switch(node->type) {
+  case AST_EMPTY: return ASTEmpty_to_nfa((ASTEmpty*)node);
+  case AST_LITERAL: return ASTLiteral_to_nfa((ASTLiteral*)node);
+  default: return NULL;
+  }
+}
+
+NFA*
+ASTEmpty_to_nfa(ASTEmpty *node)
 {
   Rulebook *rulebook = Rulebook_create();
   Set *current_states = Set_create();
@@ -63,7 +73,19 @@ ASTEmpty_to_nfa(ASTEmpty *empty)
   Set_push(current_states, STATE(rulebook, 1));
   Set_push(accept_states, STATE(rulebook, 1));
 
-  NFA *nfa = NFA_create(current_states, accept_states, rulebook);
+  return NFA_create(current_states, accept_states, rulebook);
+}
 
-  return nfa;
+NFA*
+ASTLiteral_to_nfa(ASTLiteral *node)
+{
+  Rulebook *rulebook = Rulebook_create();
+  Set *current_states = Set_create();
+  Set *accept_states = Set_create();
+
+  Set_push(current_states, STATE(rulebook, 1));
+  Set_push(accept_states, STATE(rulebook, 2));
+  Rulebook_add_rule(rulebook, FARule_create(rulebook, 1, node->character, 2));
+
+  return NFA_create(current_states, accept_states, rulebook);
 }

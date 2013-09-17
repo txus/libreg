@@ -48,6 +48,8 @@ ASTConcatenate* ASTConcatenate_create(ASTNode *first, ASTNode *second);
 ASTChoose* ASTChoose_create(ASTNode *first, ASTNode *second);
 ASTRepeat* ASTRepeat_create(ASTNode *pattern);
 
-NFA* ASTEmpty_to_nfa(ASTEmpty *empty);
+NFA* ASTNode_to_nfa(ASTNode *node);
+NFA* ASTEmpty_to_nfa(ASTEmpty *node);
+NFA* ASTLiteral_to_nfa(ASTLiteral *node);
 
 #endif
