@@ -56,6 +56,12 @@ If you want to run with Valgrind to ensure there are no memory leaks:
 
 Tested in Mac OSX 10.8 and Linux.
 
+## Dependencies
+
+We build the parser using a vendored version of Ian Piumarta's peg/leg library:
+
+  http://piumarta.com/software/peg/
+
 ## Who's this
 
 This was made by [Josep M. Bach (Txus)](http://txustice.me) under the MIT

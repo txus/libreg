@@ -2,7 +2,9 @@ CFLAGS=-g -O3 -std=c99 -Wall -Werror -Iinclude -DNDEBUG $(OPTFLAGS)
 LIBS=$(OPTLIBS)
 PREFIX?=/usr/local
 
+# SOURCES=$(filter-out src/reg/parser.c, $(wildcard src/**/*.c src/*.c))
 SOURCES=$(wildcard src/**/*.c src/*.c)
+
 OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 
 TEST_SRC=$(wildcard tests/*_tests.c)
@@ -12,7 +14,7 @@ TARGET=build/libreg.a
 SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 
 # The Target Build
-all: $(TARGET) $(SO_TARGET) tests
+all: parser $(TARGET) $(SO_TARGET) tests
 
 dev: CFLAGS=-g -std=c99 -Wall -Iinclude -Werror $(OPTFLAGS)
 dev: all
@@ -27,6 +29,14 @@ $(SO_TARGET): $(TARGET) $(OBJECTS)
 
 build:
 				@mkdir -p build
+
+src/reg/parser.c: src/reg/parser.leg peg
+	./deps/peg/leg -o src/reg/parser.c src/reg/parser.leg
+
+parser: src/reg/parser.c
+
+peg: deps/peg/Makefile
+	$(MAKE) -C deps/peg
 
 # The Unit Tests
 .PHONY: tests
@@ -44,6 +54,8 @@ clean:
 				rm -f tests/tests.log
 				rm -rf `find . -name "*.dSYM" -print`
 				rm -rf `find . -name "*.o" -print`
+				rm -rf `find . -name "*.leg.c" -print`
+				$(MAKE) -C deps/peg clean
 
 # The Install
 install: all

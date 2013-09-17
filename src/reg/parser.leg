@@ -1,0 +1,64 @@
+%{
+
+#include <string.h>
+#include <reg/parser.h>
+#include <reg/syntax.h>
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
+#define YYSTYPE ASTNode*
+#define YY_CTX_LOCAL 1
+#define YY_CTX_MEMBERS \
+  char *ptr; \
+  ASTNode *root;
+
+#define YY_INPUT(ctx, buf, result, max_size)   \
+{                                              \
+  int yyc = EOF; \
+  if(ctx->ptr && *(ctx->ptr) != '\0') { \
+    yyc= *ctx->ptr;                           \
+    ctx->ptr++; \
+  } \
+  result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1); \
+}
+
+%}
+
+  start = e:expression { $$ = yy->root = e; }
+
+  expression = l:literal { $$ = l }
+
+  literal = <[a-zA-Z]> { $$= (ASTNode*)ASTLiteral_create(yytext[0]); }
+
+%%
+
+ASTNode*
+parse(char *string)
+{
+  yycontext yy;
+  memset(&yy, 0, sizeof(yy));
+
+  yy.ptr = string;
+  unsigned int len = strlen(string);
+  unsigned int ctr = 0;
+
+  if(len == 0) {
+    yyrelease(&yy);
+    return (ASTNode*)ASTEmpty_create();
+  }
+
+  while (ctr <= len && yyparse(&yy)) ctr++;
+
+  ASTNode *result = yy.root;
+
+  yyrelease(&yy);
+  return result;
+}
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
