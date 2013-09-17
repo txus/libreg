@@ -84,7 +84,7 @@ ASTNode_to_nfa(ASTNode *node)
   case AST_LITERAL: return ASTLiteral_to_nfa((ASTLiteral*)node);
   case AST_CONCATENATE: return ASTConcatenate_to_nfa((ASTConcatenate*)node);
   case AST_CHOOSE: return ASTChoose_to_nfa((ASTChoose*)node);
-  default: return NULL;
+  case AST_REPEAT: return ASTRepeat_to_nfa((ASTRepeat*)node);
   }
 }
 
@@ -254,6 +254,65 @@ ASTChoose_to_nfa(ASTChoose *node)
 
   NFA_destroy(first);
   NFA_destroy(second);
+
+  return NFA_create(current_states, accept_states, rulebook);
+}
+
+NFA*
+ASTRepeat_to_nfa(ASTRepeat *node)
+{
+  Rulebook *rulebook = Rulebook_create();
+  Set *current_states = Set_create();
+  Set *accept_states = Set_create();
+
+  NFA *pattern = ASTNode_to_nfa(node->pattern);
+
+  Set_push(current_states, STATE(rulebook, 1));
+  Set_push(accept_states, STATE(rulebook, 1));
+
+  unsigned int pattern_start_state;
+  Set_foreach(pattern->initial_states, state, {
+    pattern_start_state = state; // there's only one
+  })
+
+  Set_foreach(pattern->accept_states, state, {
+    Set_push(accept_states, state);
+
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        state,
+        FREE_MOVE,
+        pattern_start_state
+        )
+      );
+  })
+
+  Rulebook_add_rule(
+    rulebook,
+    FARule_create(
+      rulebook,
+      STATE(rulebook, 1),
+      FREE_MOVE,
+      pattern_start_state
+      )
+    );
+
+  for(int i=0; i < pattern->rulebook->count; i++) {
+    FARule *r = pattern->rulebook->rules[i];
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        r->state,
+        r->character,
+        r->next_state
+        )
+      );
+  }
+
+  NFA_destroy(pattern);
 
   return NFA_create(current_states, accept_states, rulebook);
 }

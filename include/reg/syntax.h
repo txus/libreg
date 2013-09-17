@@ -54,5 +54,6 @@ NFA* ASTEmpty_to_nfa(ASTEmpty *node);
 NFA* ASTLiteral_to_nfa(ASTLiteral *node);
 NFA* ASTConcatenate_to_nfa(ASTConcatenate *node);
 NFA* ASTChoose_to_nfa(ASTChoose *node);
+NFA* ASTRepeat_to_nfa(ASTRepeat *node);
 
 #endif

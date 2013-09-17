@@ -74,6 +74,25 @@ char *test_choose() {
   return NULL;
 }
 
+char *test_repeat() {
+  ASTLiteral *a = ASTLiteral_create('a');
+  ASTRepeat *node = ASTRepeat_create((ASTNode*)a);
+
+  NFA *nfa = ASTNode_to_nfa((ASTNode*)node);
+
+  mu_assert(NFA_accepting(nfa), "Repeat NFA is not accepting when empty");
+
+  NFA_read_character(nfa, 'a');
+  mu_assert(NFA_accepting(nfa), "Repeat NFA is not accepting when 'a' (1)");
+
+  NFA_read_character(nfa, 'a');
+  mu_assert(NFA_accepting(nfa), "Repeat NFA is not accepting when 'a' (2)");
+
+  NFA_destroy(nfa);
+  ASTNode_destroy((ASTNode*)node);
+  return NULL;
+}
+
 char *all_tests() {
   mu_suite_start();
 
@@ -81,6 +100,7 @@ char *all_tests() {
   mu_run_test(test_literal);
   mu_run_test(test_concatenate);
   mu_run_test(test_choose);
+  mu_run_test(test_repeat);
 
   return NULL;
 }
