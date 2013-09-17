@@ -47,12 +47,40 @@ char *test_concatenate() {
   return NULL;
 }
 
+char *test_choose() {
+  ASTLiteral *a = ASTLiteral_create('a');
+  ASTLiteral *b = ASTLiteral_create('b');
+  ASTChoose *node = ASTChoose_create((ASTNode*)a, (ASTNode*)b);
+
+  NFA *nfa = ASTNode_to_nfa((ASTNode*)node);
+
+  mu_assert(!NFA_accepting(nfa), "Choose NFA is accepting before it should");
+
+  NFA_read_character(nfa, 'c');
+  mu_assert(!NFA_accepting(nfa), "Choose NFA is accepting 'c'");
+  NFA_reset(nfa);
+
+  NFA_read_character(nfa, 'a');
+  mu_assert(NFA_accepting(nfa), "Choose NFA is not accepting 'a'");
+  NFA_reset(nfa);
+
+  NFA_read_character(nfa, 'b');
+
+  mu_assert(NFA_accepting(nfa), "Choose NFA is not accepting 'b'");
+  NFA_reset(nfa);
+
+  NFA_destroy(nfa);
+  ASTNode_destroy((ASTNode*)node);
+  return NULL;
+}
+
 char *all_tests() {
   mu_suite_start();
 
   mu_run_test(test_empty);
   mu_run_test(test_literal);
   mu_run_test(test_concatenate);
+  mu_run_test(test_choose);
 
   return NULL;
 }

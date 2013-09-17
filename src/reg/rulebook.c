@@ -54,9 +54,14 @@ Rulebook_next_states(Rulebook *rulebook, Set *states, char character)
   unsigned int state = UNDEFINED;
 
   Set_foreach(states, st, {
-    state = Rulebook_next_state(rulebook, st, character);
-    if(state != UNDEFINED) {
-      Set_push(next_states, state);
+    for(int i=0; i < rulebook->count; i++) {
+      FARule *rule = rulebook->rules[i];
+      if(FARule_applies_to(rule, st, character)) {
+        state = FARule_follow(rule);
+        if(state != UNDEFINED) {
+          Set_push(next_states, state);
+        }
+      }
     }
   })
 

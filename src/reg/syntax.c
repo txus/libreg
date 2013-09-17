@@ -83,6 +83,7 @@ ASTNode_to_nfa(ASTNode *node)
   case AST_EMPTY: return ASTEmpty_to_nfa((ASTEmpty*)node);
   case AST_LITERAL: return ASTLiteral_to_nfa((ASTLiteral*)node);
   case AST_CONCATENATE: return ASTConcatenate_to_nfa((ASTConcatenate*)node);
+  case AST_CHOOSE: return ASTChoose_to_nfa((ASTChoose*)node);
   default: return NULL;
   }
 }
@@ -147,6 +148,82 @@ ASTConcatenate_to_nfa(ASTConcatenate *node)
         second_start_state
       )
     );
+  })
+
+  for(int i=0; i < first->rulebook->count; i++) {
+    FARule *r = first->rulebook->rules[i];
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        r->state,
+        r->character,
+        r->next_state
+        )
+      );
+  }
+
+  for(int i=0; i < second->rulebook->count; i++) {
+    FARule *r = second->rulebook->rules[i];
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        r->state,
+        r->character,
+        r->next_state
+        )
+      );
+  }
+
+  NFA_destroy(first);
+  NFA_destroy(second);
+
+  return NFA_create(current_states, accept_states, rulebook);
+}
+
+NFA*
+ASTChoose_to_nfa(ASTChoose *node)
+{
+  Rulebook *rulebook = Rulebook_create();
+  Set *current_states = Set_create();
+  Set *accept_states = Set_create();
+
+  NFA *first = ASTNode_to_nfa(node->first);
+  NFA *second = ASTNode_to_nfa(node->second);
+
+  Set_push(current_states, STATE(rulebook, 1));
+
+  Set_foreach(first->current_states, state, {
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        STATE(rulebook, 1),
+        FREE_MOVE,
+        state
+      )
+    );
+  })
+
+  Set_foreach(second->current_states, state, {
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        STATE(rulebook, 1),
+        FREE_MOVE,
+        state
+      )
+    );
+  })
+
+  Set_foreach(first->accept_states, state, {
+    Set_push(accept_states, state);
+  })
+
+  Set_foreach(second->accept_states, state, {
+    Set_push(accept_states, state);
   })
 
   for(int i=0; i < first->rulebook->count; i++) {
