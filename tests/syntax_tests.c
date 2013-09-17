@@ -7,6 +7,8 @@ char *test_empty() {
 
   mu_assert(NFA_accepting(nfa), "Empty NFA is not accepting.");
 
+  NFA_destroy(nfa);
+  ASTNode_destroy(node);
   return NULL;
 }
 
@@ -20,6 +22,8 @@ char *test_literal() {
 
   mu_assert(NFA_accepting(nfa), "Literal NFA is not accepting.");
 
+  NFA_destroy(nfa);
+  ASTNode_destroy(node);
   return NULL;
 }
 

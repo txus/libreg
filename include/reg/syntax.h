@@ -42,6 +42,7 @@ typedef struct ASTRepeat_s {
   ASTNode *pattern;
 } ASTRepeat;
 
+#define ASTNode_destroy(N) free(N)
 ASTEmpty* ASTEmpty_create();
 ASTLiteral* ASTLiteral_create(char character);
 ASTConcatenate* ASTConcatenate_create(ASTNode *first, ASTNode *second);

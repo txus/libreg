@@ -7,8 +7,8 @@ static Rulebook *rulebook = NULL;
 
 char *test_next_state() {
   Rulebook_build(
-    { .state = STATE(rulebook, 1), .character = 'a', .next_state = STATE(rulebook, 2) },
-    { .state = STATE(rulebook, 2), .character = 'b', .next_state = STATE(rulebook, 1) }
+    { .state = 1, .character = 'a', .next_state = 2 },
+    { .state = 2, .character = 'b', .next_state = 1 }
   );
 
   mu_assert(Rulebook_next_state(rulebook, STATE(rulebook, 1), 'a') == STATE(rulebook, 2), "Didn't transition to state 2");
@@ -20,8 +20,8 @@ char *test_next_state() {
 
 char *test_next_states() {
   Rulebook_build(
-    { .state = STATE(rulebook, 1), .character = 'a', .next_state = STATE(rulebook, 2) },
-    { .state = STATE(rulebook, 2), .character = 'a', .next_state = STATE(rulebook, 3) }
+    { .state = 1, .character = 'a', .next_state = 2 },
+    { .state = 2, .character = 'a', .next_state = 3 }
   );
 
   Set *previous_states = Set_create();
@@ -46,8 +46,8 @@ char *test_next_states() {
 
 char *test_follow_free_moves() {
   Rulebook_build(
-    { .state = STATE(rulebook, 1), .character = '\0', .next_state = STATE(rulebook, 2) },
-    { .state = STATE(rulebook, 2), .character = '\0', .next_state = STATE(rulebook, 3) }
+    { .state = 1, .character = '\0', .next_state = 2 },
+    { .state = 2, .character = '\0', .next_state = 3 }
   );
 
   Set *initial_states = Set_create();
@@ -72,7 +72,6 @@ char *test_follow_free_moves() {
 char *all_tests() {
   mu_suite_start();
 
-  message = NULL;
   mu_run_test(test_next_state);
   mu_run_test(test_next_states);
   mu_run_test(test_follow_free_moves);

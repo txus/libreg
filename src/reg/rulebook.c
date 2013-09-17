@@ -11,6 +11,15 @@ Rulebook_create()
 }
 
 void
+Rulebook_destroy(Rulebook *rulebook)
+{
+  for(int i=0; i < rulebook->count; i++) {
+    FARule_destroy(rulebook->rules[i]);
+  }
+  free(rulebook);
+}
+
+void
 Rulebook_add_rule(Rulebook *rulebook, FARule *rule) {
   rulebook->rules[rulebook->count] = rule;
   rulebook->count++;

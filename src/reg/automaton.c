@@ -38,6 +38,7 @@ void
 DFA_destroy(DFA *dfa)
 {
   Set_destroy(dfa->accept_states);
+  Rulebook_destroy(dfa->rulebook);
   free(dfa);
 }
 
@@ -56,6 +57,7 @@ NFA_destroy(NFA *nfa)
 {
   Set_destroy(nfa->current_states);
   Set_destroy(nfa->accept_states);
+  Rulebook_destroy(nfa->rulebook);
   free(nfa);
 }
 

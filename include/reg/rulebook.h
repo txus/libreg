@@ -13,7 +13,7 @@ typedef struct Rulebook_s {
 Rulebook* Rulebook_create();
 void Rulebook_add_rule(Rulebook *rulebook, FARule *rule);
 unsigned int Rulebook_next_state(Rulebook *rulebook, unsigned int state, char character);
-#define Rulebook_destroy(R) (free(R))
+void Rulebook_destroy(Rulebook *rulebook);
 Set* Rulebook_next_states(Rulebook *rulebook, Set *states, char character);
 Set* Rulebook_follow_free_moves(Rulebook *rulebook, Set *states);
 
