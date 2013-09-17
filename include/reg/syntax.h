@@ -7,43 +7,43 @@ typedef enum {
   AST_CONCATENATE,
   AST_CHOOSE,
   AST_REPEAT,
-} AST_Type;
+} ASTType;
 
-typedef struct AST_Node_s {
-  AST_Type type;
+typedef struct ASTNode_s {
+  ASTType type;
   unsigned int precedence;
-} AST_Node;
+} ASTNode;
 
-typedef struct AST_Empty_s {
-  AST_Node node;
-} AST_Empty;
+typedef struct ASTEmpty_s {
+  ASTNode node;
+} ASTEmpty;
 
-typedef struct AST_Literal_s {
-  AST_Node node;
+typedef struct ASTLiteral_s {
+  ASTNode node;
   char character;
-} AST_Literal;
+} ASTLiteral;
 
-typedef struct AST_Concatenate_s {
-  AST_Node node;
-  AST_Node *first;
-  AST_Node *second;
-} AST_Concatenate;
+typedef struct ASTConcatenate_s {
+  ASTNode node;
+  ASTNode *first;
+  ASTNode *second;
+} ASTConcatenate;
 
-typedef struct AST_Choose_s {
-  AST_Node node;
-  AST_Node *first;
-  AST_Node *second;
-} AST_Choose;
+typedef struct ASTChoose_s {
+  ASTNode node;
+  ASTNode *first;
+  ASTNode *second;
+} ASTChoose;
 
-typedef struct AST_Repeat_s {
-  AST_Node node;
-  AST_Node *pattern;
-} AST_Repeat;
+typedef struct ASTRepeat_s {
+  ASTNode node;
+  ASTNode *pattern;
+} ASTRepeat;
 
-AST_Empty* AST_Empty_create();
-AST_Literal* AST_Literal_create(char character);
-AST_Concatenate* AST_Concatenate_create(AST_Node *first, AST_Node *second);
-AST_Choose* AST_Choose_create(AST_Node *first, AST_Node *second);
-AST_Repeat* AST_Repeat_create(AST_Node *pattern);
+ASTEmpty* ASTEmpty_create();
+ASTLiteral* ASTLiteral_create(char character);
+ASTConcatenate* ASTConcatenate_create(ASTNode *first, ASTNode *second);
+ASTChoose* ASTChoose_create(ASTNode *first, ASTNode *second);
+ASTRepeat* ASTRepeat_create(ASTNode *pattern);
 
 #endif
