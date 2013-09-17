@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <reg/set.h>
 #include <reg/syntax.h>
 
 ASTEmpty*
@@ -50,4 +51,19 @@ ASTRepeat_create(ASTNode *pattern)
   node->node.precedence = 2;
   node->pattern = pattern;
   return node;
+}
+
+NFA*
+ASTEmpty_to_nfa(ASTEmpty *empty)
+{
+  Rulebook *rulebook = Rulebook_create();
+  Set *current_states = Set_create();
+  Set *accept_states = Set_create();
+
+  Set_push(current_states, STATE(rulebook, 1));
+  Set_push(accept_states, STATE(rulebook, 1));
+
+  NFA *nfa = NFA_create(current_states, accept_states, rulebook);
+
+  return nfa;
 }

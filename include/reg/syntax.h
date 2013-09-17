@@ -1,6 +1,8 @@
 #ifndef _LIBREG_SYNTAX_H_
 #define _LIBREG_SYNTAX_H_
 
+#include <reg/automaton.h>
+
 typedef enum {
   AST_EMPTY = 0,
   AST_LITERAL,
@@ -45,5 +47,7 @@ ASTLiteral* ASTLiteral_create(char character);
 ASTConcatenate* ASTConcatenate_create(ASTNode *first, ASTNode *second);
 ASTChoose* ASTChoose_create(ASTNode *first, ASTNode *second);
 ASTRepeat* ASTRepeat_create(ASTNode *pattern);
+
+NFA* ASTEmpty_to_nfa(ASTEmpty *empty);
 
 #endif
