@@ -6,6 +6,7 @@ typedef enum {
   AST_LITERAL,
   AST_CONCATENATE,
   AST_CHOOSE,
+  AST_REPEAT,
 } AST_Type;
 
 typedef struct AST_Node_s {
@@ -34,9 +35,15 @@ typedef struct AST_Choose_s {
   AST_Node *second;
 } AST_Choose;
 
+typedef struct AST_Repeat_s {
+  AST_Node node;
+  AST_Node *pattern;
+} AST_Repeat;
+
 AST_Empty* AST_Empty_create();
 AST_Literal* AST_Literal_create(char character);
 AST_Concatenate* AST_Concatenate_create(AST_Node *first, AST_Node *second);
 AST_Choose* AST_Choose_create(AST_Node *first, AST_Node *second);
+AST_Repeat* AST_Repeat_create(AST_Node *pattern);
 
 #endif

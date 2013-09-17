@@ -41,3 +41,13 @@ AST_Choose_create(AST_Node *first, AST_Node *second)
   node->second = second;
   return node;
 }
+
+AST_Repeat*
+AST_Repeat_create(AST_Node *pattern)
+{
+  AST_Repeat *node = calloc(1, sizeof(AST_Repeat));
+  node->node.type = AST_REPEAT;
+  node->node.precedence = 2;
+  node->pattern = pattern;
+  return node;
+}
