@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <reg/rulebook.h>
 #include <reg/automaton.h>
 
@@ -56,7 +55,9 @@ Rulebook_next_states(Rulebook *rulebook, Set *states, char character)
 
   Set_foreach(states, st, {
     state = Rulebook_next_state(rulebook, st, character);
-    Set_push(next_states, state);
+    if(state != UNDEFINED) {
+      Set_push(next_states, state);
+    }
   })
 
   return next_states;

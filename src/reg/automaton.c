@@ -43,18 +43,32 @@ DFA_destroy(DFA *dfa)
 }
 
 NFA*
-NFA_create(Set *current_states, Set *accept_states, Rulebook *rulebook)
+NFA_create(Set *initial_states, Set *accept_states, Rulebook *rulebook)
 {
   NFA *automaton = calloc(1, sizeof(NFA));
-  automaton->current_states = current_states;
+  automaton->initial_states = initial_states;
+
+  NFA_reset(automaton);
+
   automaton->accept_states = accept_states;
   automaton->rulebook = rulebook;
   return automaton;
 }
 
 void
+NFA_reset(NFA *nfa)
+{
+  if(nfa->current_states) Set_destroy(nfa->current_states);
+  nfa->current_states = Set_create();
+  Set_foreach(nfa->initial_states, st, {
+    Set_push(nfa->current_states, st);
+  })
+}
+
+void
 NFA_destroy(NFA *nfa)
 {
+  Set_destroy(nfa->initial_states);
   Set_destroy(nfa->current_states);
   Set_destroy(nfa->accept_states);
   Rulebook_destroy(nfa->rulebook);
@@ -64,27 +78,34 @@ NFA_destroy(NFA *nfa)
 unsigned int
 NFA_accepting(NFA *nfa)
 {
-  Set *current_states = Rulebook_follow_free_moves(
-    nfa->rulebook,
-    nfa->current_states
-    );
+  NFA_follow_free_moves(nfa);
 
-  Set_foreach(current_states, cur, {
+  Set_foreach(nfa->current_states, cur, {
     Set_foreach(nfa->accept_states, acc, {
       if(cur == acc)  {
-        Set_destroy(current_states);
         return 1;
       }
     })
   })
 
-  Set_destroy(current_states);
   return 0;
+}
+
+void
+NFA_follow_free_moves(NFA *nfa)
+{
+  Set *current_states = Rulebook_follow_free_moves(
+    nfa->rulebook,
+    nfa->current_states
+    );
+  Set_destroy(nfa->current_states);
+  nfa->current_states = current_states;
 }
 
 void
 NFA_read_character(NFA *nfa, char character)
 {
+  NFA_follow_free_moves(nfa);
   Set *old_states = nfa->current_states;
   Set *new_states = Rulebook_next_states(nfa->rulebook, nfa->current_states, character);
 

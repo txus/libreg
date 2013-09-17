@@ -5,9 +5,9 @@
   for(int i=0; i < count; i++) {                       \
     FARule *rule = FARule_create( \
       rulebook, \
-      rules[i].state, \
+      STATE(rulebook, rules[i].state), \
       rules[i].character, \
-      rules[i].next_state); \
+      STATE(rulebook, rules[i].next_state)); \
     Rulebook_add_rule(rulebook, rule);         \
   }                                                    \
 }

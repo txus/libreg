@@ -1,4 +1,5 @@
 #include "minunit.h"
+#include "rulebook_util.h"
 #include <reg/rule.h>
 #include <reg/rulebook.h>
 
@@ -20,13 +21,14 @@ char *test_follow() {
 char *all_tests() {
   mu_suite_start();
 
-  rulebook = Rulebook_create();
-  rule = FARule_create(rulebook, 1, 'a', 2);
+  Rulebook_build(
+    { .state = 1, .character = 'a', .next_state = 2 }
+  );
+  rule = rulebook->rules[0];
 
   mu_run_test(test_applies_to);
   mu_run_test(test_follow);
 
-  FARule_destroy(rule);
   Rulebook_destroy(rulebook);
 
   return NULL;

@@ -53,12 +53,36 @@ ASTRepeat_create(ASTNode *pattern)
   return node;
 }
 
+void
+ASTNode_destroy(ASTNode *node)
+{
+  switch(node->type) {
+  case AST_EMPTY: free(node); break;
+  case AST_LITERAL: free(node); break;
+  case AST_CONCATENATE:
+                    ASTNode_destroy(((ASTConcatenate*)node)->first);
+                    ASTNode_destroy(((ASTConcatenate*)node)->second);
+                    free(node);
+                    break;
+  case AST_CHOOSE:
+                    ASTNode_destroy(((ASTChoose*)node)->first);
+                    ASTNode_destroy(((ASTChoose*)node)->second);
+                    free(node);
+                    break;
+  case AST_REPEAT:
+                    ASTNode_destroy(((ASTRepeat*)node)->pattern);
+                    free(node);
+                    break;
+  }
+}
+
 NFA*
 ASTNode_to_nfa(ASTNode *node)
 {
   switch(node->type) {
   case AST_EMPTY: return ASTEmpty_to_nfa((ASTEmpty*)node);
   case AST_LITERAL: return ASTLiteral_to_nfa((ASTLiteral*)node);
+  case AST_CONCATENATE: return ASTConcatenate_to_nfa((ASTConcatenate*)node);
   default: return NULL;
   }
 }
@@ -85,7 +109,74 @@ ASTLiteral_to_nfa(ASTLiteral *node)
 
   Set_push(current_states, STATE(rulebook, 1));
   Set_push(accept_states, STATE(rulebook, 2));
-  Rulebook_add_rule(rulebook, FARule_create(rulebook, 1, node->character, 2));
+  Rulebook_add_rule(rulebook, FARule_create(rulebook, STATE(rulebook, 1), node->character, STATE(rulebook, 2)));
+
+  return NFA_create(current_states, accept_states, rulebook);
+}
+
+NFA*
+ASTConcatenate_to_nfa(ASTConcatenate *node)
+{
+  Rulebook *rulebook = Rulebook_create();
+  Set *current_states = Set_create();
+  Set *accept_states = Set_create();
+
+  NFA *first = ASTNode_to_nfa(node->first);
+  NFA *second = ASTNode_to_nfa(node->second);
+
+  Set_foreach(first->current_states, state, {
+    Set_push(current_states, state);
+  })
+
+  Set_foreach(second->accept_states, state, {
+    Set_push(accept_states, state);
+  })
+
+  unsigned int second_start_state = UNDEFINED;
+  Set_foreach(second->current_states, state, {
+    second_start_state = state; // there's only one
+  })
+
+  Set_foreach(first->accept_states, state, {
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        state,
+        FREE_MOVE,
+        second_start_state
+      )
+    );
+  })
+
+  for(int i=0; i < first->rulebook->count; i++) {
+    FARule *r = first->rulebook->rules[i];
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        r->state,
+        r->character,
+        r->next_state
+        )
+      );
+  }
+
+  for(int i=0; i < second->rulebook->count; i++) {
+    FARule *r = second->rulebook->rules[i];
+    Rulebook_add_rule(
+      rulebook,
+      FARule_create(
+        rulebook,
+        r->state,
+        r->character,
+        r->next_state
+        )
+      );
+  }
+
+  NFA_destroy(first);
+  NFA_destroy(second);
 
   return NFA_create(current_states, accept_states, rulebook);
 }
