@@ -1,13 +1,24 @@
 # libreg [![Build Status](https://travis-ci.org/txus/libreg.png)](https://travis-ci.org/txus/libreg)
 
-Regular expressions library implemented as non-deterministic finite-state
-automata.
+Simple regular expressions library implemented as non-deterministic
+finite-state automata. No fancy features, *very* basic.
 
 Design inspired by [Understanding Computation][book], an amazing book by Tom Stuart.
 
-## Warning: NOT USABLE YET! Work in progress!
+## Usage
 
-## Using
+```c
+#include <reg/reg.h>
+
+unsigned int matched = 0;
+
+Reg *regex = Reg_compile("ab|c");
+
+matched = Reg_match(regex, "ac"); // matched! 1
+matched = Reg_match(regex, "abc"); // not matched! 0
+
+Reg_destroy(regex);
+```
 
 ### Installing it as a submodule
 
@@ -37,10 +48,6 @@ all: libreg <your> <other> <targets>
 ```
 
 Done! :)
-
-### Interface
-
-...
 
 ## Development
 

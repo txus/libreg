@@ -114,6 +114,29 @@ char *test_parse_multiple() {
   return NULL;
 }
 
+char *test_parse_multiple_two() {
+  ASTNode *node = parse("ab|c");
+
+  mu_assert(node->type == AST_CONCATENATE, "Didn't get concatenate node.");
+
+  ASTConcatenate *concat = (ASTConcatenate*)node;
+  mu_assert(concat->first->type == AST_LITERAL, "First is not a literal.");
+  mu_assert(concat->second->type == AST_CHOOSE, "Second is not a choose.");
+
+  ASTChoose *choose = (ASTChoose*)concat->second;
+
+  mu_assert(choose->first->type  == AST_LITERAL, "Subfirst is not a literal.");
+  mu_assert(choose->second->type == AST_LITERAL, "Subsecond is not a literal.");
+
+  ASTLiteral *b = (ASTLiteral*)choose->first;
+  mu_assert(b->character == 'b', "subfirst character is not 'b'.");
+  ASTLiteral *c = (ASTLiteral*)choose->second;
+  mu_assert(c->character == 'c', "subsecond character is not 'c'.");
+
+  ASTNode_destroy(node);
+  return NULL;
+}
+
 char *test_parse_repeat() {
   ASTNode *node = parse("a*");
 
@@ -139,6 +162,7 @@ char *all_tests() {
   mu_run_test(test_parse_concatenate_multiple);
   mu_run_test(test_parse_choose);
   mu_run_test(test_parse_multiple);
+  mu_run_test(test_parse_multiple_two);
   mu_run_test(test_parse_repeat);
 
   return NULL;
