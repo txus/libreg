@@ -26,10 +26,10 @@
 }
 
 %}
-
   start = e:expression { $$ = yy->root = e; }
 
-  expression = l:literal { $$ = l }
+  expression = e:literal { $$ = e }
+               ( f:expression )* { $$ = (ASTNode*)ASTConcatenate_create(e, f); }
 
   literal = <[a-zA-Z]> { $$= (ASTNode*)ASTLiteral_create(yytext[0]); }
 
@@ -38,19 +38,14 @@
 ASTNode*
 parse(char *string)
 {
+  if(strlen(string) == 0) return (ASTNode*)ASTEmpty_create();
+
   yycontext yy;
   memset(&yy, 0, sizeof(yy));
 
   yy.ptr = string;
-  unsigned int len = strlen(string);
-  unsigned int ctr = 0;
 
-  if(len == 0) {
-    yyrelease(&yy);
-    return (ASTNode*)ASTEmpty_create();
-  }
-
-  while (ctr <= len && yyparse(&yy)) ctr++;
+  while (yyparse(&yy));
 
   ASTNode *result = yy.root;
 

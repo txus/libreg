@@ -28,7 +28,7 @@ ASTConcatenate_create(ASTNode *first, ASTNode *second)
   node->node.type = AST_CONCATENATE;
   node->node.precedence = 1;
   node->first = first;
-  node->second = second;
+  node->second = second ? second : (ASTNode*)ASTEmpty_create();
   return node;
 }
 

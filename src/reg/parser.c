@@ -317,20 +317,39 @@ YY_ACTION(void) yy_1_literal(yycontext *yy, char *yytext, int yyleng)
 #undef yypos
 #undef yy
 }
+YY_ACTION(void) yy_2_expression(yycontext *yy, char *yytext, int yyleng)
+{
+#define f yy->__val[-1]
+#define e yy->__val[-2]
+#define __ yy->__
+#define yypos yy->__pos
+#define yythunkpos yy->__thunkpos
+  yyprintf((stderr, "do yy_2_expression\n"));
+  {
+   __ = (ASTNode*)ASTConcatenate_create(e, f); ;
+  }
+#undef yythunkpos
+#undef yypos
+#undef yy
+#undef f
+#undef e
+}
 YY_ACTION(void) yy_1_expression(yycontext *yy, char *yytext, int yyleng)
 {
-#define l yy->__val[-1]
+#define f yy->__val[-1]
+#define e yy->__val[-2]
 #define __ yy->__
 #define yypos yy->__pos
 #define yythunkpos yy->__thunkpos
   yyprintf((stderr, "do yy_1_expression\n"));
   {
-   __ = l ;
+   __ = e ;
   }
 #undef yythunkpos
 #undef yypos
 #undef yy
-#undef l
+#undef f
+#undef e
 }
 YY_ACTION(void) yy_1_start(yycontext *yy, char *yytext, int yyleng)
 {
@@ -370,9 +389,13 @@ if (!(YY_END)) goto l1;
   return 0;
 }
 YY_RULE(int) yy_expression(yycontext *yy)
-{  int yypos0= yy->__pos, yythunkpos0= yy->__thunkpos;  yyDo(yy, yyPush, 1, 0);
-  yyprintf((stderr, "%s\n", "expression"));  if (!yy_literal(yy)) goto l2;  yyDo(yy, yySet, -1, 0);  yyDo(yy, yy_1_expression, yy->__begin, yy->__end);
-  yyprintf((stderr, "  ok   %s @ %s\n", "expression", yy->__buf+yy->__pos));  yyDo(yy, yyPop, 1, 0);
+{  int yypos0= yy->__pos, yythunkpos0= yy->__thunkpos;  yyDo(yy, yyPush, 2, 0);
+  yyprintf((stderr, "%s\n", "expression"));  if (!yy_literal(yy)) goto l2;  yyDo(yy, yySet, -2, 0);  yyDo(yy, yy_1_expression, yy->__begin, yy->__end);
+  l3:;	
+  {  int yypos4= yy->__pos, yythunkpos4= yy->__thunkpos;  if (!yy_expression(yy)) goto l4;  yyDo(yy, yySet, -1, 0);  goto l3;
+  l4:;	  yy->__pos= yypos4; yy->__thunkpos= yythunkpos4;
+  }  yyDo(yy, yy_2_expression, yy->__begin, yy->__end);
+  yyprintf((stderr, "  ok   %s @ %s\n", "expression", yy->__buf+yy->__pos));  yyDo(yy, yyPop, 2, 0);
   return 1;
   l2:;	  yy->__pos= yypos0; yy->__thunkpos= yythunkpos0;
   yyprintf((stderr, "  fail %s @ %s\n", "expression", yy->__buf+yy->__pos));
@@ -380,10 +403,10 @@ YY_RULE(int) yy_expression(yycontext *yy)
 }
 YY_RULE(int) yy_start(yycontext *yy)
 {  int yypos0= yy->__pos, yythunkpos0= yy->__thunkpos;  yyDo(yy, yyPush, 1, 0);
-  yyprintf((stderr, "%s\n", "start"));  if (!yy_expression(yy)) goto l3;  yyDo(yy, yySet, -1, 0);  yyDo(yy, yy_1_start, yy->__begin, yy->__end);
+  yyprintf((stderr, "%s\n", "start"));  if (!yy_expression(yy)) goto l5;  yyDo(yy, yySet, -1, 0);  yyDo(yy, yy_1_start, yy->__begin, yy->__end);
   yyprintf((stderr, "  ok   %s @ %s\n", "start", yy->__buf+yy->__pos));  yyDo(yy, yyPop, 1, 0);
   return 1;
-  l3:;	  yy->__pos= yypos0; yy->__thunkpos= yythunkpos0;
+  l5:;	  yy->__pos= yypos0; yy->__thunkpos= yythunkpos0;
   yyprintf((stderr, "  fail %s @ %s\n", "start", yy->__buf+yy->__pos));
   return 0;
 }
@@ -440,19 +463,14 @@ YY_PARSE(yycontext *) YYRELEASE(yycontext *yyctx)
 ASTNode*
 parse(char *string)
 {
+  if(strlen(string) == 0) return (ASTNode*)ASTEmpty_create();
+
   yycontext yy;
   memset(&yy, 0, sizeof(yy));
 
   yy.ptr = string;
-  unsigned int len = strlen(string);
-  unsigned int ctr = 0;
 
-  if(len == 0) {
-    yyrelease(&yy);
-    return (ASTNode*)ASTEmpty_create();
-  }
-
-  while (ctr <= len && yyparse(&yy)) ctr++;
+  while (yyparse(&yy));
 
   ASTNode *result = yy.root;
 
