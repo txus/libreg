@@ -88,6 +88,48 @@ char *test_parse_choose() {
   return NULL;
 }
 
+char *test_parse_multiple() {
+  ASTNode *node = parse("a|bc");
+
+  mu_assert(node->type == AST_CHOOSE, "Didn't get choose node.");
+
+  ASTChoose *choose = (ASTChoose*)node;
+
+  mu_assert(choose->first->type  == AST_LITERAL, "First is not a literal.");
+  mu_assert(choose->second->type == AST_CONCATENATE, "Second is not a concatenate.");
+
+  ASTLiteral *a  = (ASTLiteral*)choose->first;
+  mu_assert(a->character == 'a', "first character is not 'a'.");
+
+  ASTConcatenate *second = (ASTConcatenate*)choose->second;
+  mu_assert(second->first->type == AST_LITERAL, "Subfirst is not a literal.");
+  mu_assert(second->second->type == AST_LITERAL, "Subfirst is not a literal.");
+
+  ASTLiteral *subfirst = (ASTLiteral*)second->first;
+  ASTLiteral *subsecond = (ASTLiteral*)second->second;
+  mu_assert(subfirst->character == 'b', "Subfirst character is not a 'b'.");
+  mu_assert(subsecond->character == 'c', "Subsecond character is not a 'c'.");
+
+  ASTNode_destroy(node);
+  return NULL;
+}
+
+char *test_parse_repeat() {
+  ASTNode *node = parse("a*");
+
+  mu_assert(node->type == AST_REPEAT, "Didn't get repeat node.");
+
+  ASTRepeat *repeat = (ASTRepeat*)node;
+
+  mu_assert(repeat->pattern->type == AST_LITERAL, "Pattern is not a literal.");
+
+  ASTLiteral *a = (ASTLiteral*)repeat->pattern;
+  mu_assert(a->character == 'a', "first character is not 'a'.");
+
+  ASTNode_destroy(node);
+  return NULL;
+}
+
 char *all_tests() {
   mu_suite_start();
 
@@ -96,6 +138,8 @@ char *all_tests() {
   mu_run_test(test_parse_concatenate);
   mu_run_test(test_parse_concatenate_multiple);
   mu_run_test(test_parse_choose);
+  mu_run_test(test_parse_multiple);
+  mu_run_test(test_parse_repeat);
 
   return NULL;
 }

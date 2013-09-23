@@ -29,13 +29,15 @@
   start = e:expression { $$ = yy->root = e; }
 
   expression = e:literal { $$ = e }
-             ( OR f:expression { $$= (ASTNode*)ASTChoose_create(e, f); }
+             ( OR f:expression { $$ = (ASTNode*)ASTChoose_create(e, f); }
              | f:expression { $$ = (ASTNode*)ASTConcatenate_create(e, f); }
+             | STAR { $$ = (ASTNode*)ASTRepeat_create(e); }
              )*
 
   literal = <[a-zA-Z]> { $$= (ASTNode*)ASTLiteral_create(yytext[0]); }
 
-  OR = "|"
+  OR   = "|"
+  STAR = "*"
 
 %%
 
