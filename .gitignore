@@ -3,3 +3,4 @@ build
 tests/*_tests
 tests/tests.log
 *.dSYM
+deps/peg/*
